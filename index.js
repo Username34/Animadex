@@ -1,5 +1,6 @@
 var express = require('express');
 var fileUpload = require('express-fileupload');
+var wd = require("word-definition");
 var app = express();
 
 // default options
@@ -9,10 +10,10 @@ const Rekognition = require('node-rekognition');
 
 // Set your AWS credentials
 const AWSParameters = {
-    "accessKeyId": "",
-    "secretAccessKey": "",
-    "region": "",
-    "bucket": "",
+    "accessKeyId": "***",
+    "secretAccessKey": "***",
+    "region": "us-east-2",
+    "bucket": "***",
 }
 
 const rekognition = new Rekognition(AWSParameters);
@@ -40,11 +41,19 @@ app.post('/upload', function(req, res) {
       if (err)
         return res.status(500).send(err);
    
-    const s3Images = rekognition.uploadToS3('/**/**/Documents/Animadex/'+sampleFile.name, '/images');
+    const s3Images = rekognition.uploadToS3('/Users/mehdi/Documents/Animadex/'+sampleFile.name, 'images/');
 
     s3Images.then (function(value) {
-        console.log(value);
-        res.send('File uploaded!');
+        var key = value.Key;
+        console.log(key);
+        const imageLabels =  rekognition.detectLabels({Key:key});
+        imageLabels.then (function(value) {
+            if (value.Labels[0].Name == 'Animal'){
+                wd.getDef(value.Labels[1].Name.toLowerCase(), "en", null, function(definition) {
+                    res.send(definition.definition);
+                });
+            }
+          });
       });
     });
   });
