@@ -1,0 +1,24 @@
+{
+  "name": "animadex",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Username34/Animadex.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Username34/Animadex/issues"
+  },
+  "homepage": "https://github.com/Username34/Animadex#readme",
+  "dependencies": {
+    "aws-sdk": "^2.216.1",
+    "express": "^4.16.3",
+    "node-rekognition": "^0.3.0"
+  }
+}
