@@ -18,8 +18,16 @@ const Polly = new AWS.Polly({
 
 const Rekognition = require('node-rekognition');
 
+var contents = Fs.readFileSync("awsParam.json");
+ var json_aws_param = JSON.parse(contents);
+
 // Set your AWS credentials
-const AWSParameters = '';
+const AWSParameters = {
+    "accessKeyId": json_aws_param.accessKeyId,
+    "secretAccessKey": json_aws_param.secretAccessKey,
+    "region": json_aws_param.region,
+    "bucket": json_aws_param.bucket
+};
 
 if (AWSParameters == '') {
   throw new Error("T'as pas copié la constante AWSParameters de Mehdi andouille !");
@@ -50,7 +58,12 @@ app.post('/upload', function(req, res) {
                     synthesizeSpeech(function (src){
                         console.log(src);
                         if (src == true){
-                            res.send("."+path+sampleFile.name+".mp3");
+                            let song = path+sampleFile.name+".mp3";
+                            res.set({'Content-Type': 'audio/mpeg'});
+                            res.set('accept-ranges', 'bytes');
+
+                            readStream = Fs.createReadStream(song);
+                            readStream.pipe(res);
                         }
                     },definition.word+". "+definition.definition, sampleFile.name);
                 });
