@@ -1,33 +1,31 @@
 var express = require('express');
 var fileUpload = require('express-fileupload');
 var wd = require("word-definition");
+const AWS = require('aws-sdk')
 var app = express();
+const Fs = require('fs')
+
+let path = '/Users/mehdi/Documents/Animadex/';
 
 // default options
 app.use(fileUpload());
+
+// Create an Polly client
+const Polly = new AWS.Polly({
+    signatureVersion: 'v4',
+    region: 'us-east-2'
+})
 
 const Rekognition = require('node-rekognition');
 
 // Set your AWS credentials
 const AWSParameters = {
-    "accessKeyId": "***",
-    "secretAccessKey": "***",
+    "accessKeyId": "**",
+    "secretAccessKey": "**",
     "region": "us-east-2",
-    "bucket": "***",
+    "bucket": "**",
 }
-
 const rekognition = new Rekognition(AWSParameters);
-
-/*app.get('/image', function(req, res) {
-    const imageLabels =  rekognition.detectLabels({Key:'chat.jpg'});
-    imageLabels.then (function(value) {
-        //console.log (value);
-        if (value.Labels[0].Name == 'Animal'){
-            res.send(value.Labels[0].Name);
-        }
-        res.end();
-      });
-});*/
 
 app.post('/upload', function(req, res) {
     if (!req.files)
@@ -37,20 +35,24 @@ app.post('/upload', function(req, res) {
     let sampleFile = req.files.sampleFile;
    
     // Use the mv() method to place the file somewhere on your server
-    sampleFile.mv('/Users/mehdi/Documents/Animadex/'+sampleFile.name, function(err) {
+    sampleFile.mv(path+sampleFile.name, function(err) {
       if (err)
         return res.status(500).send(err);
    
-    const s3Images = rekognition.uploadToS3('/Users/mehdi/Documents/Animadex/'+sampleFile.name, 'images/');
+    const s3Images = rekognition.uploadToS3(path+sampleFile.name, 'images/');
 
     s3Images.then (function(value) {
         var key = value.Key;
-        console.log(key);
         const imageLabels =  rekognition.detectLabels({Key:key});
         imageLabels.then (function(value) {
             if (value.Labels[0].Name == 'Animal'){
                 wd.getDef(value.Labels[1].Name.toLowerCase(), "en", null, function(definition) {
-                    res.send(definition.definition);
+                    synthesizeSpeech(function (src){
+                        console.log(src);
+                        if (src == true){
+                            res.send("."+path+sampleFile.name+".mp3");
+                        }
+                    },definition.word+". "+definition.definition, sampleFile.name);
                 });
             }
           });
@@ -58,3 +60,28 @@ app.post('/upload', function(req, res) {
     });
   });
 app.listen(3000);
+
+function synthesizeSpeech (callback, text, name){
+    let params = {
+        'Text': text,
+        'OutputFormat': 'mp3',
+        'VoiceId': 'Joey'
+    }
+    
+    Polly.synthesizeSpeech(params, (err, data) => {
+        if (err) {
+            console.log(err.code)
+        } else if (data) {
+            if (data.AudioStream instanceof Buffer) {
+                Fs.writeFile(path+name+".mp3", data.AudioStream, function(err) {
+                    if (err) {
+                        return console.log(err)
+                        callback(false);
+                    }
+                    callback(true);
+                    console.log("The file was saved!")
+                })
+            }
+        }
+    })
+}
