@@ -42,10 +42,12 @@
 
 .mainContent.error label:after {
   content: "(╯°□°）╯︵ ┻━┻";
+
 }
 
 .mainContent.error label {
   background-color: red;
+  font-size: 1.5em;
 }
 
 .mainContent.success label {
@@ -54,7 +56,7 @@
 
 
 .mainContent.success label:after {
-  content: ":)";
+  content: "ʕ•ᴥ•ʔ";
 }
 
 #animaform {

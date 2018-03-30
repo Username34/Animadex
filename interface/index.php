@@ -65,7 +65,8 @@ jQuery(document).ready(function($) {
           maincontent.removeClass('error');
           maincontent.addClass('success');
           changerMessage('Trouvé !');
-          $('#animaplayer').html('<audio controls autoplay><source src="tmp/' + fichier + '.mp3" type="audio/ogg"><source src="tmp/' + fichier + '.png.mp3" type="audio/mpeg">Met à jour ton navigateur de cromagnon connard</audio>');
+
+          jouerSon('tmp/' + fichier + '.mp3');
         }
 
       },
@@ -74,6 +75,9 @@ jQuery(document).ready(function($) {
         maincontent.removeClass('loading');
         maincontent.removeClass('success');
         maincontent.addClass('error');
+
+        jouerSon('interface/assets/audio/wrong.wav');
+
         changerMessage('Erreur de connexion');
       }
     });
@@ -82,12 +86,20 @@ jQuery(document).ready(function($) {
 
   });
 
+  function jouerSon(url) {
+    var sound = new Howl({
+      src: [url]
+    });
+    sound.play();
+  }
+
   function notAnAnimal() {
     maincontent.removeClass('loading');
     maincontent.removeClass('success');
     maincontent.addClass('error');
     changerMessage('Animal non reconnu');
-    $('#animaplayer').html('<audio controls autoplay><source src="interface/assets/audio/wrong.wav" type="audio/ogg"><source src="interface/assets/audio/wrong.wav" type="audio/mpeg">Met à jour ton navigateur de cromagnon connard</audio>');
+
+    jouerSon('interface/assets/audio/wrong.wav');
   }
 
   function changerMessage(msg) {
