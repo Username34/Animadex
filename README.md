@@ -2,6 +2,8 @@
 Projet scolaire utilisant les services aws pour reconnaitre une image
 et lire sa définition selon wikipédia.
 
+Travail de : Medhi BOUZIANE, Esteve YAHIA et Vincent RAMBAUD
+
 Pour que l'application fonctionne il faut :
   - avoir node.js
   - le répertoire .aws dans son répertoire perso avec le fichier credentials de dans
