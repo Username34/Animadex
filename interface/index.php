@@ -60,7 +60,6 @@ jQuery(document).ready(function($) {
           notAnAnimal();
         }
         else {
-          $('#animaplayer').html('<audio controls autoplay><source src="interface/assets/audio/wrong.wav" type="audio/ogg"><source src="interface/assets/audio/wrong.wav" type="audio/mpeg">Met à jour ton navigateur de cromagnon connard</audio>');
           maincontent.removeClass('loading');
           maincontent.removeClass('error');
           maincontent.addClass('success');
