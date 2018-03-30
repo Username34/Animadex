@@ -62,6 +62,9 @@ jQuery(document).ready(function($) {
       },
       error : function(resultat, statut, erreur){
         console.log(erreur);
+        maincontent.removeClass('loading');
+        maincontent.removeClass('success');
+        maincontent.addClass('error');
       }
     });
 
