@@ -1,14 +1,18 @@
 
-    <div class="mainContent">
+    <div class="mainContent container col-xs-12">
 
       <div id="animaplayer">
       </div>
 
       <form id="animaform" action="#" method="POST" enctype="multipart/form-data">
-        <label for="animage">Photo</label>
+        <label for="animage"></label>
         <input type="file" id="animage" name="animage" multiple>
         <input type="submit" id="submit" value="Valider"/>
       </form>
+
+      <div id="message">
+        <p>Choisissez une image !</p>
+      </div>
 
     </div>
 
@@ -20,6 +24,7 @@ jQuery(document).ready(function($) {
   });
 
   var maincontent = $('.mainContent');
+  var message = $('#message p');
 
   $('#animaform').submit(function(event) {
 
@@ -28,6 +33,8 @@ jQuery(document).ready(function($) {
     maincontent.removeClass('error');
     maincontent.removeClass('success');
     maincontent.addClass('loading');
+
+    changerMessage('Veuillez patienter...');
 
     var form = $('form');
     var file = $('#animage');
@@ -53,9 +60,11 @@ jQuery(document).ready(function($) {
           notAnAnimal();
         }
         else {
+          $('#animaplayer').html('<audio controls autoplay><source src="interface/assets/audio/wrong.wav" type="audio/ogg"><source src="interface/assets/audio/wrong.wav" type="audio/mpeg">Met à jour ton navigateur de cromagnon connard</audio>');
           maincontent.removeClass('loading');
           maincontent.removeClass('error');
           maincontent.addClass('success');
+          changerMessage('Trouvé !');
           $('#animaplayer').html('<audio controls autoplay><source src="tmp/' + fichier + '.mp3" type="audio/ogg"><source src="tmp/' + fichier + '.png.mp3" type="audio/mpeg">Met à jour ton navigateur de cromagnon connard</audio>');
         }
 
@@ -65,6 +74,7 @@ jQuery(document).ready(function($) {
         maincontent.removeClass('loading');
         maincontent.removeClass('success');
         maincontent.addClass('error');
+        changerMessage('Erreur de connexion');
       }
     });
 
@@ -76,7 +86,12 @@ jQuery(document).ready(function($) {
     maincontent.removeClass('loading');
     maincontent.removeClass('success');
     maincontent.addClass('error');
+    changerMessage('Animal non reconnu');
     $('#animaplayer').html('<audio controls autoplay><source src="interface/assets/audio/wrong.wav" type="audio/ogg"><source src="interface/assets/audio/wrong.wav" type="audio/mpeg">Met à jour ton navigateur de cromagnon connard</audio>');
+  }
+
+  function changerMessage(msg) {
+    message.html(msg);
   }
 
 });
