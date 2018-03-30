@@ -5,6 +5,12 @@ const AWS = require('aws-sdk')
 var app = express();
 const Fs = require('fs')
 
+app.use(function(req, res, next){
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
+
+
 let path = __dirname + '/tmp/';
 
 // default options
@@ -36,24 +42,34 @@ if (AWSParameters == '') {
 const rekognition = new Rekognition(AWSParameters);
 
 app.post('/upload', function(req, res) {
+    console.log(1);
     if (!req.files)
+
       return res.status(400).send('No files were uploaded.');
 
     // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+    console.log(2);
     let sampleFile = req.files.sampleFile;
 
     // Use the mv() method to place the file somewhere on your server
     sampleFile.mv(path+sampleFile.name, function(err) {
-      if (err)
+      if (err) {
+        console.log(3);
         return res.status(500).send(err);
+      }
 
+    console.log(4);
     const s3Images = rekognition.uploadToS3(path+sampleFile.name, 'images/');
-
+    console.log(5);
     s3Images.then (function(value) {
+        console.log(6);
         var key = value.Key;
+        console.log(7);
         const imageLabels =  rekognition.detectLabels({Key:key});
+        console.log(8);
         imageLabels.then (function(value) {
             if (value.Labels[0].Name == 'Animal'){
+                console.log(9);
                 wd.getDef(value.Labels[1].Name.toLowerCase(), "en", null, function(definition) {
                     synthesizeSpeech(function (src){
                         console.log(src);
@@ -67,9 +83,13 @@ app.post('/upload', function(req, res) {
                         }
                     },definition.word+". "+definition.definition, sampleFile.name);
                 });
+            } else {
+              res.json(null);
             }
           });
+
       });
+
     });
   });
 app.listen(3000);
@@ -93,7 +113,7 @@ function synthesizeSpeech (callback, text, name){
                         callback(false);
                     }
                     callback(true);
-                    console.log("OK :) Le fichier a été enregistré")
+                    console.log("OK :)")
                 })
             }
         }
